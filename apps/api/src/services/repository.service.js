@@ -35,7 +35,6 @@ export async function getRepository(owner, repo) {
       // const data = await response.json();
       const transformedData = {
         name: response.name,
-        cachedAt: Date.now(),
         owner: response.owner.login,
         description: response.description,
         stars: response.stargazers_count,

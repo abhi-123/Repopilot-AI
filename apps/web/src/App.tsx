@@ -1,14 +1,9 @@
 import { useState } from "react";
 import "./App.css";
-import RepoPreview from "./components/repoPreview/RepoPreview";
-
-interface RepoDataResponse {
-  name: string;
-  owner: string;
-  stars: number;
-  forks: number;
-  description?: string | null;
-}
+// import RepoPreview from "./components/repoPreview/RepoPreview";
+import { fetchRepository } from "./api/repository.api";
+import type { RepoDataResponse } from "./types/repository.types";
+import RepositoryCard from "./components/RepoCard/RepositoryCard";
 
 function App() {
   const [repoUrl, setRepoUrl] = useState<string>("");
@@ -17,16 +12,22 @@ function App() {
 
   const [repoData, setRepoData] = useState<RepoDataResponse | null>(null);
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     try {
-      setError(null);
+      setError("");
       setIsLoading(true);
+      setRepoData(null);
       const { repo, owner } = ParsedGithubURL(repoUrl);
       console.log(repo, owner);
+      const data = await fetchRepository(owner, repo);
+      console.log(data);
+      setRepoData(data);
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Something went wrong!",
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -190,11 +191,12 @@ function App() {
 
           <div className="panel-divider" />
 
-          <div className="preview-section">
-            <span className="preview-label">LIVE INPUT PREVIEW</span>
+          {/* <div className="preview-section"> */}
+          {/* <span className="preview-label">LIVE INPUT PREVIEW</span> */}
 
-            <RepoPreview url={repoUrl} />
-          </div>
+          {/* <RepoPreview url={repoUrl} /> */}
+          {repoData && !isLoading && <RepositoryCard repository={repoData} />}
+          {/* </div> */}
         </section>
 
         <p className="footer-note">Built with React, TypeScript & Fastify</p>
